@@ -20,8 +20,10 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver'){
         try{
             const {_json} = profile
             const res = {
+                id: _json.id,
                 name: _json.nickname,
-                photo: _json.profile_image
+                photo: _json.profile_image,
+                accessToken
             }
             done(null, `${res}`)
         }catch(e){
