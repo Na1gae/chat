@@ -1,16 +1,23 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
+import { MessageInterface } from './model/message/message.interface';
 
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
-  @WebSocketServer()
+  @WebSocketServer() //CORS
   server : Server
+
+  constructor(
+    private authService: AuthService
+  ){}
 
   clients: {[socketId: string]: boolean} = {}
   clientNick: {[socketId: string]: string} = {}
   roomUsers: {[key:string]: string[]} = {}
 
   handleConnection(client: Socket): void{
+    //JWT 검증 추가
     if(this.clients[client.id]){
       client.disconnect(true)
     }
@@ -18,6 +25,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   }
 
   handleDisconnect(client: Socket) {
+    //다른 서비스로 뺄 예정
     delete this.clients[client.id]
 
     Object.keys(this.roomUsers).forEach((r) =>{{
@@ -30,22 +38,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   }
   
   @SubscribeMessage('chat')
-  handleChat(client: Socket, dat: {content: string, room: string}){
-    const rdat = {
-      userId: client.id,
-      userNick: this.clientNick[client.id],
-      msg: dat.content,
-      room: dat.room,
-      time: Date.now()
+    async addMessage(socket: Socket, message: MessageInterface){
+      //const createdMessage: MessageInterface = await this.messageService.create({...message, user: })
+      //const joinedUsers: JoinedRoomInterface[] = await this.joinedRoomService.findByRoom(room)
+      /*for(const user of joinedUsers){
+        await this.server.to(user.socketId).emit('', createdMessage)
+      }*/
     }
-    this.server.to(dat.room).emit('chat', )
-  }
+}
 
-  @SubscribeMessage('setClientNick')
-  handlesetClientNick(client: Socket, nick: string){
-    this.clientNick[client.id] = nick
-  }
-
+/*
   @SubscribeMessage('join')
   handleJoin(client: Socket, room: string){
     if(client.rooms.has(room)) return
@@ -63,6 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   @SubscribeMessage('exit')
   handleExit(client: Socket, room: string){
     if(client.rooms.has(room)) return
+    
     client.leave(room)
 
     const idx = this.roomUsers[room]?.indexOf(this.clientNick[client.id])
@@ -71,5 +74,4 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
         this.server.to(room).emit('left', {userNick: this.clientNick[client.id], userId: client.id, room})
         this.server.to(room).emit('userList', {room, userList: this.roomUsers[room]})
       }
-  }
-}
+  } */
