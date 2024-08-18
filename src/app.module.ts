@@ -5,6 +5,9 @@ import { ChatModule } from './chat/chat.module';
 import { FileModule } from './file/file.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -24,8 +27,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get<string>('DATABASE_NAME'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: true,
-    })}), AuthModule, ChatModule, FileModule],
-  controllers: [AppController],
-  providers: []
+    })}), AuthModule, ChatModule, FileModule, UserModule],
+  controllers: [AppController, UserController],
+  providers: [UserService]
 })
 export class AppModule {}
