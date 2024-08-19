@@ -16,8 +16,7 @@ export class WsJwtAuthGuard extends AuthGuard('jwt'){
         try{
             const token = authToken.split(' ')[1]
             const payload = this.jwtService.verify(token)
-            client.user = payload // <= context.switchToHttp().getRequest().user = payload
-            // HTTP 요청 객체에 저장하기보단, Websocket Client 객체에 저장
+            client.user = payload
             return true
         }catch(error){
             throw new WsException('잘못된 토큰')
