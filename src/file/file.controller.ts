@@ -33,6 +33,6 @@ export class FileController {
    @Post('upload')
    uploadFile(@UploadedFile() file: Express.Multer.File){
     const url = file.filename
-    return {url : `${url}`}
+    return {url : `/profile/${url}`}
    }
 }
