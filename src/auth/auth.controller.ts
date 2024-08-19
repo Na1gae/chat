@@ -16,9 +16,15 @@ export class AuthController {
     }
 
     @Post('login')
-    async login(){}
+    async login(@Body('userId') userId: string, @Body('password') password:string){
+        
+    }
 
     @Post('signup')
-    async signup(){}
+    async signup(
+        @Body('userId') userId: string,
+        @Body('password') password: string,
+        @Body('userNick') userNick: string
+    ){}
 
 }

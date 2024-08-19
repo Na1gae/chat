@@ -3,22 +3,25 @@ import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { UserInterface } from 'src/chat/model/user.interface';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
     constructor(private readonly jwtService: JwtService, private readonly httpService: HttpService, private readonly configService: ConfigService){}
 
-    async generateJWT(user: UserInterface): Promise<string>{ //추후 user는 UserInterface 적용
+    async generateJWT(user: UserInterface): Promise<string>{
         return this.jwtService.signAsync({user})
     }
 
     async passwordHash(password: string): Promise<string>{
-        return 
-        //bcrypt
+        const saltRounds = this.configService.get<number>('PASSWORD_SALT')
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
+        return hashedPassword
     }
 
-    async comparePassword(password: string, hashedPassword: string): Promise<any>{
-    
+    async comparePassword(password: string, hashedPassword: string): Promise<boolean>{
+        if(await bcrypt.compare(password, hashedPassword)) return true
+        else return false
     }
 
     async validateRecaptcha(token: string): Promise<boolean>{
@@ -43,4 +46,8 @@ export class AuthService {
     verifyJwt(jwt: string): Promise<any>{
         return this.jwtService.verifyAsync(jwt)
     }
+
+    //Sign in
+    
+    //Sign up
 }
