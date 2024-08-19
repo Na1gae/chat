@@ -2,6 +2,7 @@ import { Controller, PayloadTooLargeException, Post, UnsupportedMediaTypeExcepti
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { v4 as uuid } from 'uuid'
 
 const MAX_SIZE = 10000
 
@@ -20,16 +21,18 @@ export class FileController {
         callback(null, true)
     },
     storage: diskStorage({
-        destination: './',
+        destination: './profile/',
         filename: (req, file, callback)=>{
-            const id = req.user
+            //Mongoose DB
+            const id = uuid()
             const hwakjang = file.mimetype.split('/')
-            callback(null, `${id}-profile.${hwakjang[hwakjang.length-1]}`)
+            callback(null, `${id}${hwakjang[hwakjang.length-1]}`)
         }
     })
    }))
    @Post('upload')
    uploadFile(@UploadedFile() file: Express.Multer.File){
-    return {url : `${file.filename}`}
+    const url = file.filename
+    return {url : `${url}`}
    }
 }
