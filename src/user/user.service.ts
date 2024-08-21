@@ -49,14 +49,19 @@ export class UserService {
         const user = await this.userModel.findOne({userId}).exec()
         if(!user) throw new ForbiddenException("너는 참여자가 아니다")
         const users = await this.userModel.find({
-            //foreach로 userId마다 ObjId 이용
-            _id: { $in: room.userIds }
+            userId: { $in: room.userIds }
         }).exec()
         const res = users.map(user => {
             _id: user.userId;
             profileImage: user.profileImage;
             userNick: user.userNick;
         })
+        return res
+    }
+    async gethashedPasswordByUserId(userId: string){
+        const user = await this.userModel.findOne({userId}).exec()
+        if(!user) throw new NotFoundException("")
+        const res = user.password
         return res
     }
 }

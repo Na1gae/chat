@@ -1,8 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsDate, IsNotEmpty, IsString } from "class-validator";
 
+export type UserDocument = User & Document
+
 @Schema()
-export class User extends Document{
+export class User{
     @Prop({required: true, unique: true})
     @IsString()
     @IsNotEmpty()
