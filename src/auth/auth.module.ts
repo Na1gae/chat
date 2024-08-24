@@ -15,6 +15,7 @@ import { User, UserSchema } from 'src/chat/model/user.schema';
 @Module({
     imports: [
         ConfigModule,
+        JwtModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
@@ -31,7 +32,7 @@ import { User, UserSchema } from 'src/chat/model/user.schema';
         HttpModule, 
         UserModule
     ],
-    providers: [AuthService, JwtStrategy],
+    providers: [AuthService, JwtStrategy, JwtService],
     controllers: [AuthController],
     exports: [AuthService]
 })

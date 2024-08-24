@@ -7,12 +7,15 @@ import { Room, RoomSchema } from './model/room.schema';
 import { User, UserSchema } from './model/user.schema';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
       HttpModule,
+      JwtModule,
+      AuthModule,
       MongooseModule.forFeature([
           { name: Chat.name, schema: ChatSchema },
           { name: Room.name, schema: RoomSchema },
