@@ -1,12 +1,15 @@
-import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessageInterface } from './model/message.interface';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtAuthGuard } from 'src/auth/guard/ws-jwt-auth.guard';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth/auth.service';
+import { Types } from 'mongoose';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway({
+  namespace: '/chat',
   cors: {
   origin: '*'
 }})
@@ -16,7 +19,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   server : Server
 
   constructor(
-    private authService: AuthService
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+    private readonly chatSerivce: ChatService
   ){}
 
   handleConnection(client: Socket){
@@ -27,12 +32,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   }
 
   @UseGuards(WsJwtAuthGuard)
-  @SubscribeMessage('chat')
-    async addMessage(socket: Socket, @MessageBody() message: MessageInterface){
-      //const createdMessage: MessageInterface = await this.messageService.create({...message, user: })
-      //const joinedUsers: JoinedRoomInterface[] = await this.joinedRoomService.findByRoom(room)
-      /*for(const user of joinedUsers){
-        await this.server.to(user.socketId).emit('', createdMessage)
-      }*/
+  @SubscribeMessage('joinChat')
+  async handleJoinChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { userId: Types.ObjectId, roomId: Types.ObjectId}
+  ){
+    client.join(`${payload.userId}`)
+    const connectionTime = new Date(Date.now())
+    const perviousMessages = await this.chatSerivce.getPreviousMessage(payload.userId, payload.roomId, connectionTime)
+    client.emit('previousMessages', perviousMessages)
+  }
+  
+  @UseGuards(WsJwtAuthGuard)
+  @SubscribeMessage('sendMessage')
+    async handleMessage(
+      @ConnectedSocket() socket: Socket, 
+      @MessageBody() payload: {senderId: Types.ObjectId, roomId: Types.ObjectId, content: string}
+    ){
+      const chat = await this.chatSerivce.saveMessage(payload.senderId, payload.roomId, payload.content)
     }
 }
