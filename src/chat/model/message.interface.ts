@@ -5,6 +5,5 @@ export interface MessageInterface{
     id: string,
     content: string,
     user: UserInterface,
-    room: RoomInterface,
-    timestamp: number
+    room: RoomInterface
 }
