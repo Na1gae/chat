@@ -1,10 +1,14 @@
-import { Body, Controller, Get, Headers } from '@nestjs/common';
+import { Body, Controller, Get, Headers, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
+import { Types } from 'mongoose';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('user')
 export class UserController {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly authService: AuthService
     ){}
 
     @Get('/idJungbok')
@@ -13,17 +17,24 @@ export class UserController {
     }
 
     @Get('/profileimg')
+    @UseGuards(JwtAuthGuard)
     async getProfileimgByid(@Body('id') id: string){ //JWT Permission Check 추가
         return this.userService.profileimg(id)
     }
 
     @Get('/getChatrooms')
-    async getChatroomsByuserId(userId: string){ //userId -> JWT
-        return this.userService.getUserChatrooms(userId)
+    @UseGuards(JwtAuthGuard)
+    async getChatroomsByuserId(@Headers('authorization') authheader: string){ //userId -> JWT
+        const token = authheader?.split(' ')[1];
+        const userData = await this.authService.decodeToken(token);
+        return this.userService.getUserChatrooms(userData._id)
     }
 
     @Get('/getChats')
-    async getChatByRoomId(@Body('id') roomId: string, userId :string ){ //userId -> JWT
-        return this.userService.getChatsByRoomId(userId, roomId)
+    @UseGuards(JwtAuthGuard)
+    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: string){ //userId -> JWT
+        const token = authheader?.split(' ')[1];
+        const userData = await this.authService.decodeToken(token);
+        return this.userService.getChatsByRoomId(userData.userId, roomId)
     }
 }

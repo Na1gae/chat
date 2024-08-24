@@ -15,9 +15,4 @@ export class JwtStrategy extends PassportStrategy(Strategy){
         })
     }
 
-    async validate(payload: JwtPayload){
-        const user = await this.userService.gethashedPasswordByUserId(payload.userId)
-        if (!user) throw new UnauthorizedException('유효하지 않은 토큰')
-        return true
-    }
 }

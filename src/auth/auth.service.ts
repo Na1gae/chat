@@ -63,10 +63,11 @@ export class AuthService {
         if(!res) throw new UnauthorizedException()
         
         const user = await this.userModel.findOne({ userId }).exec()
-        const jwtreturn: JwtPayload = {
+        const jwtreturn: JwtPayload= {
             _id: user._id,
             userNick: user.userNick,
             profileImage: user.profileImage,
+            userId: user.userId
         }
 
         const accessToken = this.jwtService.sign(jwtreturn)
