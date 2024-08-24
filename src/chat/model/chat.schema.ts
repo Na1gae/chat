@@ -4,8 +4,10 @@ import { User } from "./user.schema"
 import { v4 as uuidv4 } from "uuid" 
 import { IsDate, IsNotEmpty } from "class-validator";
 
+export type ChatDocument = Chat & Document
+
 @Schema()
-export class Chat extends Document{
+export class Chat{
   @Prop({default: () => uuidv4() })
   chatId: string
 

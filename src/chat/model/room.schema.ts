@@ -1,10 +1,12 @@
-import { Prop, Schema } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { User } from "./user.schema";
 import { Types } from "mongoose";
 import { Chat } from "./chat.schema";
 
+export type RoomDocument = Room & Document
+
 @Schema()
-export class Room extends Document{
+export class Room{
     @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], required: true })
     userIds: Types.ObjectId[]
     
@@ -14,3 +16,5 @@ export class Room extends Document{
     /*@Prop({ required: true, default: "single"})
     roomtype: string*/
 }
+
+export const RoomSchema = SchemaFactory.createForClass(Room)

@@ -1,15 +1,15 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Chat } from './model/chat.schema';
+import { Chat, ChatDocument } from './model/chat.schema';
 import { Model, Types } from 'mongoose';
-import { Room } from './model/room.schema';
+import { Room, RoomDocument } from './model/room.schema';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChatService {
     constructor(
-        @InjectModel("Chat") private readonly chatModel: Model<Chat>,
-        @InjectModel("Room") private readonly roomModel: Model<Room>,
+        @InjectModel("Chat") private readonly chatModel: Model<ChatDocument>,
+        @InjectModel("Room") private readonly roomModel: Model<RoomDocument>,
         private readonly userService: UserService
     ){}
 
