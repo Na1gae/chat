@@ -3,12 +3,14 @@ import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { ChatService } from 'src/chat/chat.service';
 
 @Controller('user')
 export class UserController {
     constructor(
         private readonly userService: UserService,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly chatService: ChatService
     ){}
 
     @Get('/idJungbok')
@@ -36,5 +38,13 @@ export class UserController {
         const token = authheader?.split(' ')[1];
         const userData = await this.authService.decodeToken(token);
         return this.userService.getChatsByRoomId(userData.userId, roomId)
+    }
+
+    @Get('/makeChatroom')
+    @UseGuards(JwtAuthGuard)
+    async makeChatroom(@Headers('authorization') authheader: string, @Body('opponents') opponentIds: string[]){
+        const token = authheader?.split(' ')[1];
+        const userData = await this.authService.decodeToken(token);
+        return this.chatService.makeNewRoom(userData._id, opponentIds)
     }
 }
