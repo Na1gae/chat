@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
@@ -6,13 +6,14 @@ import { FileModule } from './file/file.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
       ConfigModule.forRoot({
         isGlobal: true,
         envFilePath: '.env',
-      }),
+      }),ConfigModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,7 +23,8 @@ import { MongooseModule } from '@nestjs/mongoose';
         useUnifiedTopology: true
       })
     })
-    , AuthModule, ChatModule, FileModule, UserModule],
+    , AuthModule, ChatModule, FileModule, UserModule, JwtModule],
+  providers: [JwtService],
   controllers: [AppController]
 })
 export class AppModule {}
