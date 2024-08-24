@@ -19,8 +19,6 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
           inject: [ConfigService],
           useFactory: (configService: ConfigService) => ({
               uri: configService.get<string>('MONGODB_URI'),
-              useNewUrlParser: true,
-              useUnifiedTopology: true
           })
       }),
       AuthModule, 

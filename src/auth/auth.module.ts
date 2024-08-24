@@ -11,6 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Chat, ChatSchema } from 'src/chat/model/chat.schema';
 import { Room, RoomSchema } from 'src/chat/model/room.schema';
 import { User, UserSchema } from 'src/chat/model/user.schema';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
     imports: [
@@ -30,7 +31,8 @@ import { User, UserSchema } from 'src/chat/model/user.schema';
             { name: User.name, schema: UserSchema }
         ]),
         HttpModule, 
-        UserModule
+        UserModule,
+        FileModule
     ],
     providers: [AuthService, JwtStrategy, JwtService],
     controllers: [AuthController],
