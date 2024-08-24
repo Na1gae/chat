@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Chat, ChatDocument } from './model/chat.schema';
 import { Model, Types } from 'mongoose';
 import { Room, RoomDocument } from './model/room.schema';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChatService {
@@ -30,7 +31,6 @@ export class ChatService {
         
         const connectionObjId = new Types.ObjectId(Math.floor(connectionTime.getTime()/1000).toString(16)+"0000000000000000")
 
-        
         return this.chatModel
         .find({
             _id: {$lt: connectionObjId, $in: room.chatIds}
@@ -39,7 +39,7 @@ export class ChatService {
         .exec()
     }
 
-    async makeNewRoom(userId: Types.ObjectId, opponents: string[]) Promise<Room>{
+    async makeNewRoom(userId: Types.ObjectId, opponents: string[]): Promise<Room>{
     try{
         const opponentsObjIds = await Promise.all(
             opponents.map(async (e) => this.userService.getUserObjId(e))
@@ -49,4 +49,6 @@ export class ChatService {
         })
         return await newRoom.save()
     }catch(e){}
+    
+    }
 }
