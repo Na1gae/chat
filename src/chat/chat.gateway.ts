@@ -50,5 +50,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
       @MessageBody() payload: {senderId: Types.ObjectId, roomId: Types.ObjectId, content: string}
     ){
       const chat = await this.chatSerivce.saveMessage(payload.senderId, payload.roomId, payload.content)
+      //여기수정
     }
 }

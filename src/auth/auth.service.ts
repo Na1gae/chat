@@ -55,7 +55,6 @@ export class AuthService {
         return this.jwtService.verifyAsync(jwt)
     }
 
-    //Sign in
     async signIn(userId: string, typedpassword: string): Promise<any>{
         const hashedPassword = await this.userService.gethashedPasswordByUserId(userId)
         const res = await this.comparePassword(typedpassword, hashedPassword)
@@ -74,7 +73,6 @@ export class AuthService {
         return { messsage:"success", accessToken: accessToken }
     }
     
-    //Sign up
     async signUp(userId: string, typedpassword: string, userNick: string, profileImage: string): Promise<any>{
         const hashedPassword = await this.passwordHash(typedpassword)
         const newUser = new this.userModel({

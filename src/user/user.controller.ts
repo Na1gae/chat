@@ -12,7 +12,7 @@ export class UserController {
     ){}
 
     @Get('/idJungbok')
-    async idjungbok(@Body('id') id: string){ //횟수 카운트 추가
+    async idjungbok(@Body('id') id: string){
         return this.userService.idJungbok(id)
     }
 
@@ -32,7 +32,7 @@ export class UserController {
 
     @Get('/getChats')
     @UseGuards(JwtAuthGuard)
-    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: string){ //userId -> JWT
+    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: Types.ObjectId){ //userId -> JWT
         const token = authheader?.split(' ')[1];
         const userData = await this.authService.decodeToken(token);
         return this.userService.getChatsByRoomId(userData.userId, roomId)
