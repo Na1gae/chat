@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chat } from 'src/chat/model/chat.schema';
 import { Room } from 'src/chat/model/room.schema';
@@ -12,7 +12,11 @@ export class UserService {
         @InjectModel(Room.name) private roomModel: Model<Room>,
         @InjectModel(User.name) private userModel: Model<User>
     ){} 
-
+    async getUserObjId(id: string): Promise<Types.ObjectId>{
+        const user = await this.userModel.findOne({userId: id}).exec()
+        if(user) throw new NotFoundException
+        return user._id
+    }
     async idJungbok(id: string): Promise<boolean>{ //TRUE : 가능, FALSE: 불가능
         const user = await this.userModel.findOne({userId: id}).exec()
         if(user) return false

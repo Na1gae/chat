@@ -2,8 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chat, ChatDocument } from './model/chat.schema';
 import { Model, Types } from 'mongoose';
-import { Room, RoomDocument } from './model/room.schema';
-import { UserService } from 'src/user/user.service';
+import { Room, Room, RoomDocument } from './model/room.schema';
 
 @Injectable()
 export class ChatService {
@@ -39,4 +38,15 @@ export class ChatService {
         .sort({_id: 1})
         .exec()
     }
+
+    async makeNewRoom(userId: Types.ObjectId, opponents: string[]) Promise<Room>{
+    try{
+        const opponentsObjIds = await Promise.all(
+            opponents.map(async (e) => this.userService.getUserObjId(e))
+        );
+        const newRoom = new this.roomModel({
+            userIds: [userId, ...opponentsObjIds]
+        })
+        return await newRoom.save()
+    }catch(e){}
 }
