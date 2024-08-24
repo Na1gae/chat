@@ -8,6 +8,7 @@ import { UserService } from './user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { ChatService } from 'src/chat/chat.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { HttpModule, HttpService } from '@nestjs/axios';
       ]),
       JwtModule
   ],
-  providers: [UserService, AuthService],
+  providers: [UserService, AuthService, ChatService],
   controllers: [UserController],
   exports: [UserService]
 })
