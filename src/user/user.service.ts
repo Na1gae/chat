@@ -20,9 +20,10 @@ export class UserService {
     }
     async profileimg(id: string): Promise<string>{
         const user = await this.userModel.findOne({userId: id}).exec()
+        //const user = await this.userModel.findOne({_id: id}).exec()
         return user.profileImage
     }
-    async getUserChatrooms(userId: string){
+    async getUserChatrooms(userId: Types.ObjectId){
         const rooms = await this.roomModel.find({userIds: userId}).exec()
         const roomIds = rooms.map(room => room._id)
         return roomIds
@@ -32,7 +33,7 @@ export class UserService {
         const room = await this.roomModel.findById(roomObjId).exec()
         if(!room) throw new NotFoundException("Room Not found")
         const user = await this.userModel.findOne({userId}).exec()
-        if(!user) throw new ForbiddenException("너는 참여자가 아니다")
+        if(!user) throw new ForbiddenException("")
 
         const chats = await this.chatModel.find({roomId: roomObjId}).exec()
         const res = chats.map(chat => ({
@@ -47,7 +48,7 @@ export class UserService {
         const room = await this.roomModel.findById(roomObjId).exec()
         if(!room) throw new NotFoundException("Room Not found")
         const user = await this.userModel.findOne({userId}).exec()
-        if(!user) throw new ForbiddenException("너는 참여자가 아니다")
+        if(!user) throw new ForbiddenException("")
         const users = await this.userModel.find({
             userId: { $in: room.userIds }
         }).exec()

@@ -12,7 +12,7 @@ export class FileController {
 
    @UseInterceptors(FileInterceptor('image', {
     fileFilter: (_, file, callback) => {
-        if(!file.mimetype.match(/image\/(jpeg|png|jpg|heif|gif)/)){
+        if(!file.mimetype.match(/image\/(jpeg|png|jpg|gif)/)){
             callback(new UnsupportedMediaTypeException(''), false)
         }
         if(file.size > MAX_SIZE){
@@ -23,10 +23,9 @@ export class FileController {
     storage: diskStorage({
         destination: './profile/',
         filename: (req, file, callback)=>{
-            //Mongoose DB
             const id = uuid()
-            const hwakjang = file.mimetype.split('/')
-            callback(null, `${id}${hwakjang[hwakjang.length-1]}`)
+            const hwakjang = file.mimetype.split('/').pop();
+            callback(null, `${id}.${hwakjang}`);
         }
     })
    }))

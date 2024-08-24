@@ -1,3 +1,7 @@
+import { Types } from "mongoose";
+
 export interface JwtPayload{
-    userId: string
+    _id: Types.ObjectId,
+    userNick: string,
+    profileImage: string
 }

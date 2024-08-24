@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -8,6 +8,7 @@ import { UserService } from 'src/user/user.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/chat/model/user.schema';
 import { Model } from 'mongoose';
+import { JwtPayload } from './strategies/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -58,13 +59,23 @@ export class AuthService {
     async signIn(userId: string, typedpassword: string): Promise<any>{
         const hashedPassword = await this.userService.gethashedPasswordByUserId(userId)
         const res = await this.comparePassword(typedpassword, hashedPassword)
-        return res
+        
+        if(!res) throw new UnauthorizedException()
+        
+        const user = await this.userModel.findOne({ userId }).exec()
+        const jwtreturn: JwtPayload = {
+            _id: user._id,
+            userNick: user.userNick,
+            profileImage: user.profileImage,
+        }
+
+        const accessToken = this.jwtService.sign(jwtreturn)
+        return { messsage:"success", accessToken: accessToken }
     }
     
     //Sign up
     async signUp(userId: string, typedpassword: string, userNick: string, profileImage: string): Promise<any>{
         const hashedPassword = await this.passwordHash(typedpassword)
-        
         const newUser = new this.userModel({
             userId: userId,
             userNick: userNick,
@@ -73,5 +84,14 @@ export class AuthService {
             date: Date.now()
         })
         return newUser.save()
+    }
+
+    async decodeToken(token: string): Promise<JwtPayload>{
+        try{
+            const decoded = this.jwtService.verify<JwtPayload>(token)
+            return decoded
+        }catch(err){
+            throw new ForbiddenException()
+        }
     }
 }
