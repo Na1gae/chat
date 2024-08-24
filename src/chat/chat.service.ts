@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chat, ChatDocument } from './model/chat.schema';
 import { Model, Types } from 'mongoose';
-import { Room, Room, RoomDocument } from './model/room.schema';
+import { Room, RoomDocument } from './model/room.schema';
 
 @Injectable()
 export class ChatService {
