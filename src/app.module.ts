@@ -11,20 +11,24 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 @Module({
   imports: [
       ConfigModule.forRoot({
-        isGlobal: true,
-        envFilePath: '.env',
-      }),ConfigModule,
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      })
-    })
-    , AuthModule, ChatModule, FileModule, UserModule, JwtModule],
-  providers: [JwtService],
-  controllers: [AppController]
+          isGlobal: true,
+          envFilePath: '.env',
+      }),
+      MongooseModule.forRootAsync({
+          imports: [ConfigModule],
+          inject: [ConfigService],
+          useFactory: (configService: ConfigService) => ({
+              uri: configService.get<string>('MONGODB_URI'),
+              useNewUrlParser: true,
+              useUnifiedTopology: true
+          })
+      }),
+      AuthModule, 
+      ChatModule, 
+      FileModule, 
+      UserModule
+  ],
+  controllers: [AppController],
+  providers: []
 })
 export class AppModule {}

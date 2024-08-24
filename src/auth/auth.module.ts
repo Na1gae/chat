@@ -17,17 +17,21 @@ import { User, UserSchema } from 'src/chat/model/user.schema';
         ConfigModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
-            useFactory: async(configService: ConfigService) => ({
-                secret: configService.get('JWT_SECRET_CODE'),
-                signOptions: {expiresIn: '10000'}
+            useFactory: async (configService: ConfigService) => ({
+                secret: configService.get<string>('JWT_SECRET_CODE'),
+                signOptions: { expiresIn: '10000' }
             }),
             inject: [ConfigService]
         }),
-        MongooseModule.forFeature([{ name: Chat.name, schema: ChatSchema }]),
-        MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-        UserModule, HttpModule],
-    providers: [AuthService, JwtStrategy, ConfigService, UserService, JwtService],
+        MongooseModule.forFeature([
+            { name: Chat.name, schema: ChatSchema },
+            { name: Room.name, schema: RoomSchema },
+            { name: User.name, schema: UserSchema }
+        ]),
+        HttpModule, 
+        UserModule
+    ],
+    providers: [AuthService, JwtStrategy],
     controllers: [AuthController],
     exports: [AuthService]
 })
