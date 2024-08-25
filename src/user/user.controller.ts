@@ -19,14 +19,12 @@ export class UserController {
     }
 
     @Get('/profileimg')
-    @UseGuards(JwtAuthGuard)
-    async getProfileimgByid(@Body('id') id: string){ //JWT Permission Check 추가
+    async getProfileimgByid(@Body('id') id: string){
         return this.userService.profileimg(id)
     }
 
     @Get('/getChatrooms')
-    @UseGuards(JwtAuthGuard)
-    async getChatroomsByuserId(@Headers('authorization') authheader: string){ //userId -> JWT
+    async getChatroomsByuserId(@Headers('authorization') authheader: string){
         const token = authheader?.split(' ')[1];
         const userData = await this.authService.decodeToken(token);
         const objUserId = new Types.ObjectId(userData._id)
@@ -34,8 +32,7 @@ export class UserController {
     }
 
     @Get('/getChats')
-    @UseGuards(JwtAuthGuard)
-    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: string){ //userId -> JWT
+    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: string){
         const token = authheader?.split(' ')[1];
         const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
         const objroomId = new Types.ObjectId(roomId)
@@ -43,7 +40,6 @@ export class UserController {
     }
 
     @Get('/makeChatroom')
-    @UseGuards(JwtAuthGuard)
     async makeChatroom(@Headers('authorization') authheader: string, @Body('opponents') opponentIds: string[]){
         const token = authheader?.split(' ')[1];
         const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
@@ -51,7 +47,6 @@ export class UserController {
     }
 
     @Get('/getUsersByRoomId')
-    @UseGuards(JwtAuthGuard)
     async getUsersByRoomId(@Headers('authorization') authheader: string, @Body('roomId') roomId: string){
         const token = authheader?.split(' ')[1]
         const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)

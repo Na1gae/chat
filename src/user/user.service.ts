@@ -24,6 +24,7 @@ export class UserService {
     }
     async profileimg(id: string): Promise<string>{
         const user = await this.userModel.findOne({userId: id}).exec()
+        if(!user) throw new NotFoundException()
         return user.profileImage
     }
     async getUserChatrooms(userId: Types.ObjectId){

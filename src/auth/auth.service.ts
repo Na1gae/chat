@@ -61,12 +61,11 @@ export class AuthService {
         if(!res) throw new UnauthorizedException()
         const user = await this.userModel.findOne({ userId }).exec()
         const jwtreturn: JwtPayload= {
-            _id: user._id,
+            _id: `${user._id}`,
             userNick: user.userNick,
             profileImage: user.profileImage,
-            userId: user.userId
+            sub: user.userId
         }
-        //const accessToken = jwt.sign(jwtreturn, process.env.JWT_SECRET)
         return { messsage:"success", accessToken: this.jwtService.sign(jwtreturn) }
     }
     
@@ -84,7 +83,7 @@ export class AuthService {
 
     async decodeToken(token: string): Promise<JwtPayload>{
         try{
-            const decoded = this.jwtService.verify<JwtPayload>(token)
+            const decoded = this.jwtService.verify<JwtPayload>(token, {secret: this.configService.get('JWT_SECRET')})
             return decoded
         }catch(err){
             throw new ForbiddenException()

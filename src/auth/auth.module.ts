@@ -12,6 +12,7 @@ import { Chat, ChatSchema } from 'src/chat/model/chat.schema';
 import { Room, RoomSchema } from 'src/chat/model/room.schema';
 import { User, UserSchema } from 'src/chat/model/user.schema';
 import { FileModule } from 'src/file/file.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { FileModule } from 'src/file/file.module';
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
                 secret: configService.get('JWT_SECRET'),
-                signOptions: { expiresIn: '3600s' }
+                signOptions: { expiresIn: '2h' }
             }),
         }),
         MongooseModule.forFeature([
@@ -32,9 +33,10 @@ import { FileModule } from 'src/file/file.module';
         HttpModule, 
         UserModule,
         FileModule,
+        PassportModule
     ],
     providers: [AuthService, JwtStrategy],
     controllers: [AuthController],
-    exports: [AuthService]
+    exports: [AuthService, JwtModule, PassportModule]
 })
 export class AuthModule {}

@@ -9,6 +9,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { ChatService } from 'src/chat/chat.service';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -18,10 +19,11 @@ import { ChatService } from 'src/chat/chat.service';
           { name: Room.name, schema: RoomSchema },
           { name: User.name, schema: UserSchema },
       ]),
-      JwtModule
+      JwtModule,
+      PassportModule
   ],
   providers: [UserService, AuthService, ChatService],
   controllers: [UserController],
-  exports: [UserService]
+  exports: [UserService, PassportModule, JwtModule]
 })
 export class UserModule {}
