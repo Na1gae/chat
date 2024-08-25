@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export type UserDocument = User & Document
 
@@ -20,7 +20,7 @@ export class User{
     @IsNotEmpty()
     password: string
 
-    @Prop({required: true, default: ""})
+    @Prop({default: ""})
     @IsString()
     profileImage: string
 }
