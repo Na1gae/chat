@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chat, ChatDocument } from './model/chat.schema';
 import { Model, Types } from 'mongoose';
@@ -26,13 +26,15 @@ export class ChatService {
     }
 
     async getPreviousMessage(userId: Types.ObjectId, roomId: Types.ObjectId, connectionTime: Date): Promise<Chat[]>{
-        const room = await this.roomModel.findById(roomId).populate('chatIds').exec()
-        //const user = await this.userModel.findById(userId).exec()
-        const isUserInThatRoom = await (await this.userService.getUserChatrooms(userId)).includes(userId)
+        const room = await this.roomModel.findById(roomId).populate('chatIds').exec();
+        if (!room) throw new ForbiddenException('Room not found');
+
+        const userChatrooms = await this.userService.getUserChatrooms(userId);
+        const isUserInThatRoom = userChatrooms.includes(roomId);
         
-        if(!room || !isUserInThatRoom) throw new ForbiddenException()
+        if(!isUserInThatRoom) throw new ForbiddenException('User is not in this room');
         
-        const connectionObjId = new Types.ObjectId(Math.floor(connectionTime.getTime()/1000).toString(16)+"0000000000000000")
+        const connectionObjId = new Types.ObjectId(Math.floor(connectionTime.getTime()/1000).toString(16).padEnd(24, '0'))
 
         return this.chatModel
         .find({
@@ -45,13 +47,18 @@ export class ChatService {
     async makeNewRoom(userId: Types.ObjectId, opponents: string[]): Promise<Room>{
     try{
         const opponentsObjIds = await Promise.all(
-            opponents.map(async (e) => this.userService.getUserObjId(e))
+            opponents.map(async (e) => {
+                const userObjId = this.userService.getUserObjId(e)
+                if(!userObjId) throw new NotFoundException(e)
+                return userObjId
+        })
         );
         const newRoom = new this.roomModel({
             userIds: [userId, ...opponentsObjIds]
         })
         return await newRoom.save()
-    }catch(e){}
-    
+    }catch(e){
+        throw new Error('방 만드는데 에러')
+    }
     }
 }
