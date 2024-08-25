@@ -59,7 +59,6 @@ export class AuthService {
         const res = await this.comparePassword(typedpassword, hashedPassword)
         
         if(!res) throw new UnauthorizedException()
-        
         const user = await this.userModel.findOne({ userId }).exec()
         const jwtreturn: JwtPayload= {
             _id: user._id,
@@ -67,9 +66,8 @@ export class AuthService {
             profileImage: user.profileImage,
             userId: user.userId
         }
-
-        const accessToken = this.jwtService.sign(jwtreturn)
-        return { messsage:"success", accessToken: accessToken }
+        //const accessToken = jwt.sign(jwtreturn, process.env.JWT_SECRET)
+        return { messsage:"success", accessToken: this.jwtService.sign(jwtreturn) }
     }
     
     async signUp(userId: string, typedpassword: string, userNick: string, profileImage: string): Promise<any>{

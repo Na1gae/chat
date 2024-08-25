@@ -54,8 +54,10 @@ export class UserService {
         const users = await this.userModel.find({
             userId: { $in: room.userIds }
         }).exec()
-        const res = users.map(user => {
-            _id: user.userId;
+        const res = users
+        .filter(user => user.userId !== userId)    
+        .map(user => {
+            userId: user.userId;
             profileImage: user.profileImage;
             userNick: user.userNick;
         })
