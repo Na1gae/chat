@@ -20,10 +20,10 @@ export class AuthController {
     }
 
     @Post('login')
-    async login(@Body('userId') userId: string, @Body('password') password:string, @Body('recaptchaToken') token: string){
-        const isValid = await this.authService.validateRecaptcha(token)
-        if(!isValid) throw new BadRequestException
-
+    async login(@Body('userId') userId: string, @Body('password') password:string, //@Body('recaptchaToken') token: string
+    ){
+        //const isValid = await this.authService.validateRecaptcha(token)
+        //if(!isValid) throw new BadRequestException
         const res = await this.authService.signIn(userId, password)
         return res
     }
@@ -43,9 +43,9 @@ export class AuthController {
         try{
             const profileImgUrl = profileImage ? profileImage.filename: '' //기본이미지 추가
             const user = await this.authService.signUp(userId, password, userNick, profileImgUrl)
-            return { message: "Success", user}
+            return { message: "Success", user }
         }catch(err){
-            return { message: err.message}
+            return { message: err.message }
     }
     }
 }

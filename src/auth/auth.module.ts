@@ -16,14 +16,13 @@ import { FileModule } from 'src/file/file.module';
 @Module({
     imports: [
         ConfigModule,
-        JwtModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
+            inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET_CODE'),
-                signOptions: { expiresIn: '10000' }
+                secret: configService.get('JWT_SECRET'),
+                signOptions: { expiresIn: '3600s' }
             }),
-            inject: [ConfigService]
         }),
         MongooseModule.forFeature([
             { name: Chat.name, schema: ChatSchema },
@@ -32,9 +31,9 @@ import { FileModule } from 'src/file/file.module';
         ]),
         HttpModule, 
         UserModule,
-        FileModule
+        FileModule,
     ],
-    providers: [AuthService, JwtStrategy, JwtService],
+    providers: [AuthService, JwtStrategy],
     controllers: [AuthController],
     exports: [AuthService]
 })
