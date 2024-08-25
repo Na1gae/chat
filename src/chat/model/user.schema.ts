@@ -23,10 +23,6 @@ export class User{
     @Prop({required: true, default: ""})
     @IsString()
     profileImage: string
-
-    @Prop({required: true, default: Date.now()})
-    @IsDate()
-    date: Date
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

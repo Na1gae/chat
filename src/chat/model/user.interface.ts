@@ -1,6 +1,6 @@
 export interface UserInterface{
-    userId?: string,
-    password?: string,
+    userId: string,
+    password: string,
     nickname: string,
-    email?: string
+    profileImage?: string 
 }
