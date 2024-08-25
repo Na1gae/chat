@@ -56,7 +56,8 @@ export class ChatService {
         const newRoom = new this.roomModel({
             userIds: [userId, ...opponentsObjIds]
         })
-        return await newRoom.save()
+        await newRoom.save()
+        return newRoom
     }catch(e){
         throw new Error('방 만드는데 에러')
     }
