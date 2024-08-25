@@ -47,4 +47,12 @@ export class UserController {
         const userData = await this.authService.decodeToken(token);
         return this.chatService.makeNewRoom(userData._id, opponentIds)
     }
+
+    @Get('/getUsersByRoomId')
+    @UseGuards(JwtAuthGuard)
+    async getUsersByRoomId(@Headers('authorization') authheader: string, @Body('roomId') roomId: string){
+        const token = authheader?.split(' ')[1]
+        const userId = (await this.authService.decodeToken(token)).userId
+        return this.userService.getUsersByRoomId(userId, roomId)
+    }
 }
