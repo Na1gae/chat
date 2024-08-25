@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Model, ObjectId, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chat } from 'src/chat/model/chat.schema';
@@ -65,7 +65,7 @@ export class UserService {
     }
     async gethashedPasswordByUserId(userId: string){
         const user = await this.userModel.findOne({userId}).exec()
-        if(!user) throw new NotFoundException("")
+        if(!user) throw new UnauthorizedException("")
         const res = user.password
         return res
     }
