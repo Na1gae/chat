@@ -29,30 +29,33 @@ export class UserController {
     async getChatroomsByuserId(@Headers('authorization') authheader: string){ //userId -> JWT
         const token = authheader?.split(' ')[1];
         const userData = await this.authService.decodeToken(token);
-        return this.userService.getUserChatrooms(userData._id)
+        const objUserId = new Types.ObjectId(userData._id)
+        return this.userService.getUserChatrooms(objUserId)
     }
 
     @Get('/getChats')
     @UseGuards(JwtAuthGuard)
-    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: Types.ObjectId){ //userId -> JWT
+    async getChatByRoomId(@Headers('authorization') authheader: string, roomId: string){ //userId -> JWT
         const token = authheader?.split(' ')[1];
-        const userData = await this.authService.decodeToken(token);
-        return this.userService.getChatsByRoomId(userData.userId, roomId)
+        const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
+        const objroomId = new Types.ObjectId(roomId)
+        return this.userService.getChatsByRoomId(userId, objroomId)
     }
 
     @Get('/makeChatroom')
     @UseGuards(JwtAuthGuard)
     async makeChatroom(@Headers('authorization') authheader: string, @Body('opponents') opponentIds: string[]){
         const token = authheader?.split(' ')[1];
-        const userData = await this.authService.decodeToken(token);
-        return this.chatService.makeNewRoom(userData._id, opponentIds)
+        const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
+        return this.chatService.makeNewRoom(userId, opponentIds)
     }
 
     @Get('/getUsersByRoomId')
     @UseGuards(JwtAuthGuard)
     async getUsersByRoomId(@Headers('authorization') authheader: string, @Body('roomId') roomId: string){
         const token = authheader?.split(' ')[1]
-        const userId = (await this.authService.decodeToken(token)).userId
-        return this.userService.getUsersByRoomId(userId, roomId)
+        const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
+        const roomObjId = new Types.ObjectId(roomId)
+        return this.userService.getUsersByRoomId(userId, roomObjId)
     }
 }

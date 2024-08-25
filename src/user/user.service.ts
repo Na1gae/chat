@@ -31,10 +31,10 @@ export class UserService {
         const roomIds = rooms.map(room => room._id)
         return roomIds
     }
-    async getChatsByRoomId(userId: string, roomId: Types.ObjectId){
+    async getChatsByRoomId(userId: Types.ObjectId, roomId: Types.ObjectId){
         const room = await this.roomModel.findById(roomId).exec()
         if(!room) throw new NotFoundException()
-        const user = await this.userModel.findOne({userId}).exec()
+        const user = await this.userModel.findById(userId).exec()
         if(!user) throw new ForbiddenException("")
 
         const chats = await this.chatModel.find({roomId: roomId}).exec()
@@ -45,17 +45,16 @@ export class UserService {
         }))
         return res
     }
-    async getUsersByRoomId(userId: string, roomId: string){
-        const roomObjId = new Types.ObjectId(roomId)
-        const room = await this.roomModel.findById(roomObjId).exec()
+    async getUsersByRoomId(userId: Types.ObjectId, roomId: Types.ObjectId){
+        const room = await this.roomModel.findById(roomId).exec()
         if(!room) throw new NotFoundException("Room Not found")
-        const user = await this.userModel.findOne({userId}).exec()
+        const user = await this.userModel.findById(userId).exec()
         if(!user) throw new ForbiddenException("")
         const users = await this.userModel.find({
             userId: { $in: room.userIds }
         }).exec()
         const res = users
-        .filter(user => user.userId !== userId)    
+        .filter(user => user._id !== userId)    
         .map(user => {
             userId: user.userId;
             profileImage: user.profileImage;

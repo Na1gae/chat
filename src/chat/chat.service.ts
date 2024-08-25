@@ -4,12 +4,14 @@ import { Chat, ChatDocument } from './model/chat.schema';
 import { Model, Types } from 'mongoose';
 import { Room, RoomDocument } from './model/room.schema';
 import { UserService } from 'src/user/user.service';
+import { UserDocument } from './model/user.schema';
 
 @Injectable()
 export class ChatService {
     constructor(
         @InjectModel("Chat") private readonly chatModel: Model<ChatDocument>,
         @InjectModel("Room") private readonly roomModel: Model<RoomDocument>,
+        @InjectModel("User") private readonly userModel: Model<UserDocument>,
         private readonly userService: UserService
     ){}
 
@@ -25,6 +27,7 @@ export class ChatService {
 
     async getPreviousMessage(userId: Types.ObjectId, roomId: Types.ObjectId, connectionTime: Date): Promise<Chat[]>{
         const room = await this.roomModel.findById(roomId).populate('chatIds').exec()
+        //const user = await this.userModel.findById(userId).exec()
         const isUserInThatRoom = await (await this.userService.getUserChatrooms(userId)).includes(userId)
         
         if(!room || !isUserInThatRoom) throw new ForbiddenException()
