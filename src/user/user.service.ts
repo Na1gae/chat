@@ -68,4 +68,8 @@ export class UserService {
         const res = user.password
         return res
     }
+    async getUserInfoByUserId(userId: string){
+        const user = await this.userModel.findOne({userId: userId}).exec()
+        return user
+    }
 }

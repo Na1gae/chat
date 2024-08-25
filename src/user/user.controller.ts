@@ -58,4 +58,9 @@ export class UserController {
         const roomObjId = new Types.ObjectId(roomId)
         return this.userService.getUsersByRoomId(userId, roomObjId)
     }
+
+    @Get('/getUserInfo')
+    async getUserInfo(@Body('userId') userId: string){
+        return this.userService.getUserInfoByUserId(userId)
+    }
 }
