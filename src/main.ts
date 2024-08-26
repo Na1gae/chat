@@ -21,10 +21,13 @@ export class DataWrapperInterceptor implements NestInterceptor {
   }
 }
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const port = process.env.PORT || 3000
+  
   app.useGlobalInterceptors(new DataWrapperInterceptor())
   app.enableCors()
-  await app.listen(3000);
+  await app.listen(port);
 }
 bootstrap();
