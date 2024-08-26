@@ -14,7 +14,7 @@ export class UserService {
     ){} 
     async getUserObjId(id: string): Promise<Types.ObjectId>{
         const user = await this.userModel.findOne({userId: id}).exec()
-        if(user) throw new NotFoundException
+        if(!user) throw new NotFoundException
         return user._id
     }
     async idJungbok(id: string): Promise<boolean>{ //TRUE : 가능, FALSE: 불가능
@@ -49,19 +49,24 @@ export class UserService {
     async getUsersByRoomId(userId: Types.ObjectId, roomId: Types.ObjectId){
         const room = await this.roomModel.findById(roomId).exec()
         if(!room) throw new NotFoundException("Room Not found")
+
         const user = await this.userModel.findById(userId).exec()
         if(!user) throw new ForbiddenException("")
+        
+
         const users = await this.userModel.find({
-            userId: { $in: room.userIds }
+            _id: { $in: room.userIds }
         }).exec()
-        const res = users
-        .filter(user => user._id !== userId)    
-        .map(user => {
-            userId: user.userId;
-            profileImage: user.profileImage;
-            userNick: user.userNick;
-        })
-        return res
+        
+        console.log(users)
+
+        return users
+        .filter(u => !u._id.equals(userId))
+        .map(u => ({
+            userId: u.userId,
+            profileImage: u.profileImage,
+            userNick: u.userNick
+        }));
     }
     async gethashedPasswordByUserId(userId: string){
         const user = await this.userModel.findOne({userId}).exec()
@@ -72,5 +77,9 @@ export class UserService {
     async getUserInfoByUserId(userId: string){
         const user = await this.userModel.findOne({userId: userId}).exec()
         return user
+    }
+    async getuserIdByObjUserId(userId: Types.ObjectId){
+        const user = await this.userModel.findById(userId).exec()
+        return user.userId
     }
 }
