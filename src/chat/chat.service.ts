@@ -30,9 +30,9 @@ export class ChatService {
         if (!room) throw new ForbiddenException('Room not found');
 
         const userChatrooms = await this.userService.getUserChatrooms(userId);
-        const isUserInThatRoom = userChatrooms.includes(roomId);
+        const isUserInThatRoom = userChatrooms.find((id) => id.toString() === roomId.toString());
         
-        if(!isUserInThatRoom) throw new ForbiddenException('User is not in this room');
+        if(isUserInThatRoom == undefined) throw new ForbiddenException('User is not in this room');
         
         const connectionObjId = new Types.ObjectId(Math.floor(connectionTime.getTime()/1000).toString(16).padEnd(24, '0'))
 
