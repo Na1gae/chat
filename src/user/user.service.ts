@@ -84,9 +84,20 @@ export class UserService {
     }
     async getInitialScreen(userId: Types.ObjectId){
         const roomIds = await this.getUserChatrooms(userId)
-        const res = roomIds.map(e => {
-            this.getUsersByRoomId(userId, e)
-        })
-        return res
+
+        const roomDataPromises = roomIds.map(async (roomId) => {
+        const users = await this.getUsersByRoomId(userId, roomId);
+        return {
+            _id: roomId,
+            memberList: users.map(user => ({
+                _id: user.userId,
+                userNick: user.userNick,
+                profileImage: user.profileImage
+            }))
+        };
+        });
+        const res = await Promise.all(roomDataPromises);
+
+        return res;
     }
 }
