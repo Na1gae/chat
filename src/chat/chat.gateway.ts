@@ -41,25 +41,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   @UseGuards(WsJwtAuthGuard)
   @SubscribeMessage('joinChat')
   async handleJoinChat(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() socket: Socket,
     @MessageBody() payload: { roomId: string}
   ){
-    console.log(`${client.request.user._id} joined room ${payload.roomId}`)
-    client.join(payload.roomId)
-    console.log(`User ${client.request.user._id} joined room ${payload.roomId}`)
+    console.log(`${socket.request.user._id} joined room ${payload.roomId}`)
+    socket.join(payload.roomId)
+    console.log(`User ${socket.request.user._id} joined room ${payload.roomId}`)
     const connectionTime = new Date(Date.now())
-    const perviousMessages = await this.chatSerivce.getPreviousMessage(new Types.ObjectId(client.request.user._id as string), new Types.ObjectId(payload.roomId), connectionTime)
+    const perviousMessages = await this.chatSerivce.getPreviousMessage(new Types.ObjectId(socket.request.user._id as string), new Types.ObjectId(payload.roomId), connectionTime)
     console.log(perviousMessages)
-    client.emit('previousMessages', perviousMessages)
+    this.server.emit('previousMessages', perviousMessages)
   }
   
   @UseGuards(WsJwtAuthGuard)
   @SubscribeMessage('sendMessage')
   async handleMessage(
       @ConnectedSocket() socket: Socket, 
-      @MessageBody() payload: {senderId: Types.ObjectId, roomId: Types.ObjectId, content: string}
+      @MessageBody() payload: {roomId: string, content: string}
     ){
-      const chat = await this.chatSerivce.saveMessage(payload.senderId, payload.roomId, payload.content)
-      socket.to(payload.roomId.toString()).emit('newMsg', chat)
+      const chat = await this.chatSerivce.saveMessage(socket.request.user._id, payload.roomId, payload.content)
+      console.log(`User ${socket.request.user._id} sent message to room ${payload.roomId}`)
+      console.log(`rooms joined: ${Array.from(socket.rooms)}`)
+      this.server.to(payload.roomId).emit('receiveMessage', chat)
     }
 }

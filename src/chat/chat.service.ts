@@ -15,8 +15,8 @@ export class ChatService {
         private readonly userService: UserService
     ){}
 
-    async saveMessage(senderId: Types.ObjectId, roomId: Types.ObjectId, message: string): Promise<Chat>{
-        const chat = new this.chatModel({senderId, roomId, message})
+    async saveMessage(userId: string, roomId: string, message: string): Promise<Chat>{
+        const chat = new this.chatModel({userId, roomId, message})
         const savedChat = await chat.save()
 
         await this.roomModel.findByIdAndUpdate(roomId, {
