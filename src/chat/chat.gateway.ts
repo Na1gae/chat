@@ -37,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { userId: Types.ObjectId, roomId: Types.ObjectId}
   ){
-    client.join(`${payload.userId}`)
+    client.join(`${payload.userId} -> ${payload.roomId}`)
     const connectionTime = new Date(Date.now())
     const perviousMessages = await this.chatSerivce.getPreviousMessage(payload.userId, payload.roomId, connectionTime)
     client.emit('previousMessages', perviousMessages)
@@ -45,11 +45,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   
   @UseGuards(WsJwtAuthGuard)
   @SubscribeMessage('sendMessage')
-    async handleMessage(
+  async handleMessage(
       @ConnectedSocket() socket: Socket, 
       @MessageBody() payload: {senderId: Types.ObjectId, roomId: Types.ObjectId, content: string}
     ){
       const chat = await this.chatSerivce.saveMessage(payload.senderId, payload.roomId, payload.content)
-      //여기수정
+      socket.to(payload.roomId.toString()).emit('newMsg', chat)
     }
 }
