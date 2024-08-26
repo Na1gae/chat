@@ -48,10 +48,14 @@ export class ChatService {
     try{
         const opponentsObjIds = await Promise.all(
             opponents.map(async (e) => {
-                const userObjId = this.userService.getUserObjId(e)
-                if(!userObjId) throw new NotFoundException(e)
-                return userObjId
-        })
+                try {
+                    const userObjId = await this.userService.getUserObjId(e);
+                    return userObjId;
+                } catch (error) {
+                    console.error(`Error getting ObjectId for user ${e}:`, error);
+                    throw error;
+                }
+            })
         );
         const newRoom = new this.roomModel({
             userIds: [userId, ...opponentsObjIds]
@@ -59,7 +63,13 @@ export class ChatService {
         await newRoom.save()
         return newRoom
     }catch(e){
-        throw new Error('방 만드는데 에러')
+        if (e instanceof NotFoundException) {
+            console.error(`방 생성 실패: ${e.message}`);
+            throw e;
+        } else {
+            console.error('방 만드는데 에러:', e);
+            throw new Error('방 만드는데 에러');
+        }
     }
     }
 }

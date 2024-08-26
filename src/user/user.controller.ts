@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, NotFoundException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -43,7 +43,10 @@ export class UserController {
     async makeChatroom(@Headers('authorization') authheader: string, @Body('opponents') opponentIds: string[]){
         const token = authheader?.split(' ')[1];
         const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
-        if(opponentIds.length<1)
+        if(opponentIds.length<1) throw new BadRequestException()
+        const jungbok = opponentIds.includes((await this.userService.getuserIdByObjUserId(userId))) 
+        if(jungbok) throw new BadRequestException('자신의 아이디는 포함될 수 없습니다')
+
         return this.chatService.makeNewRoom(userId, opponentIds)
     }
 
