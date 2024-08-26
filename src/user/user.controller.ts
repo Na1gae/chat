@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -47,7 +47,7 @@ export class UserController {
         return this.userService.getChatsByRoomId(userId, objroomId)
     }
 
-    @Get('/makeChatroom')
+    @Post('/makeChatroom')
     async makeChatroom(@Headers('authorization') authheader: string, @Body('opponents') opponentIds: string[]){
         const token = authheader?.split(' ')[1];
         const userId = new Types.ObjectId((await this.authService.decodeToken(token))._id)
