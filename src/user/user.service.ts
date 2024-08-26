@@ -82,4 +82,11 @@ export class UserService {
         const user = await this.userModel.findById(userId).exec()
         return user.userId
     }
+    async getInitialScreen(userId: Types.ObjectId){
+        const roomIds = await this.getUserChatrooms(userId)
+        const res = roomIds.map(e => {
+            this.getUsersByRoomId(userId, e)
+        })
+        return res
+    }
 }

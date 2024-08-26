@@ -28,6 +28,7 @@ export class UserController {
         const token = authheader?.split(' ')[1];
         const userData = await this.authService.decodeToken(token);
         const objUserId = new Types.ObjectId(userData._id)
+        return this.userService.getInitialScreen(objUserId)
         return this.userService.getUserChatrooms(objUserId)
     }
 
