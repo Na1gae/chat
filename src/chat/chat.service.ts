@@ -15,8 +15,8 @@ export class ChatService {
         private readonly userService: UserService
     ){}
 
-    async saveMessage(userId: string, roomId: string, message: string): Promise<Chat>{
-        const chat = new this.chatModel({userId, roomId, message})
+    async saveMessage(userId: string, roomId: string, content: string): Promise<Chat>{
+        const chat = new this.chatModel({userId, roomId, content})
         const savedChat = await chat.save()
 
         await this.roomModel.findByIdAndUpdate(roomId, {
@@ -38,7 +38,7 @@ export class ChatService {
 
         return this.chatModel
         .find({
-            _id: {$lt: connectionObjId, $in: room.chatIds}
+            _id: {$lt: connectionObjId, $in: room.chatIds}  
         })
         .sort({_id: 1})
         .exec()
