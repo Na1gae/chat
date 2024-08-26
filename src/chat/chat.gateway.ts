@@ -7,6 +7,13 @@ import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Types } from 'mongoose';
 import { ChatService } from './chat.service';
+import { IncomingMessage } from 'http';
+
+declare module 'http' {
+  interface IncomingMessage {
+    user?: any;
+  }
+}
 
 @WebSocketGateway({
   namespace: '/chat',
@@ -35,11 +42,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   @SubscribeMessage('joinChat')
   async handleJoinChat(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { userId: Types.ObjectId, roomId: Types.ObjectId}
+    @MessageBody() payload: { roomId: string}
   ){
-    client.join(`${payload.userId} -> ${payload.roomId}`)
+    console.log(`${client.request.user._id} joined room ${payload.roomId}`)
+    client.join(payload.roomId)
+    console.log(`User ${client.request.user._id} joined room ${payload.roomId}`)
     const connectionTime = new Date(Date.now())
-    const perviousMessages = await this.chatSerivce.getPreviousMessage(payload.userId, payload.roomId, connectionTime)
+    const perviousMessages = await this.chatSerivce.getPreviousMessage(new Types.ObjectId(client.request.user._id as string), new Types.ObjectId(payload.roomId), connectionTime)
+    console.log(perviousMessages)
     client.emit('previousMessages', perviousMessages)
   }
   

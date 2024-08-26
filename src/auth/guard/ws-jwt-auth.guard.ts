@@ -16,7 +16,7 @@ export class WsJwtAuthGuard extends AuthGuard('jwt'){
         try{
             const token = authToken.split(' ')[1]
             const payload = this.jwtService.verify(token)
-            client.user = payload
+            client.request.user = payload
             return true
         }catch(error){
             throw new WsException('잘못된 토큰')
