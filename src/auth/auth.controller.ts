@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, ForbiddenException, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FileService } from 'src/file/file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -35,13 +35,15 @@ export class AuthController {
         @Body('password') password: string,
         @Body('userNick') userNick: string,
         @Body('recaptchaToken') token: string,
-        @UploadedFile() profileImage?: Express.Multer.File
+        @Body('profileImage') profileImage: string,
     ){
         const isValid = await this.authService.validateRecaptcha(token)
         if(!isValid) throw new BadRequestException
         
         try{
-            const profileImgUrl = profileImage ? profileImage.filename: '' //기본이미지 추가
+            const regex = /^https:\/\/chat\.nalgae\.me\/profile\/[a-zA-Z0-9_-]*$/
+            const profileImgUrl = profileImage ? profileImage : ''
+            if(profileImgUrl !== "" || !regex.test(profileImgUrl)) throw new ForbiddenException("허용되지 않은 URL")
             const user = await this.authService.signUp(userId, password, userNick, profileImgUrl)
             return { message: "Success", user }
         }catch(err){
