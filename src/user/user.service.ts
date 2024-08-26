@@ -57,8 +57,6 @@ export class UserService {
         const users = await this.userModel.find({
             _id: { $in: room.userIds }
         }).exec()
-        
-        console.log(users)
 
         return users
         .filter(u => !u._id.equals(userId))

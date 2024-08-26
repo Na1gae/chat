@@ -24,11 +24,18 @@ export class UserController {
     }
 
     @Get('/getChatrooms')
-    async getChatroomsByuserId(@Headers('authorization') authheader: string){
+    async InitialScreenByuserId(@Headers('authorization') authheader: string){
         const token = authheader?.split(' ')[1];
         const userData = await this.authService.decodeToken(token);
         const objUserId = new Types.ObjectId(userData._id)
         return this.userService.getInitialScreen(objUserId)
+    }
+
+    @Get('/getChatroomIds')
+    async getChatroomsByuserId(@Headers('authorization') authheader: string){
+        const token = authheader?.split(' ')[1];
+        const userData = await this.authService.decodeToken(token);
+        const objUserId = new Types.ObjectId(userData._id)
         return this.userService.getUserChatrooms(objUserId)
     }
 
